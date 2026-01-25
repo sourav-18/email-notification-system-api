@@ -1,0 +1,27 @@
+{
+  "name": "email-notification-system-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sourav-18/email-notification-system-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sourav-18/email-notification-system-api/issues"
+  },
+  "homepage": "https://github.com/sourav-18/email-notification-system-api#readme",
+  "dependencies": {
+    "dateformat": "^5.0.3",
+    "dotenv": "^17.2.3",
+    "express": "^4.2.1",
+    "mongoose": "^9.1.5"
+  }
+}
