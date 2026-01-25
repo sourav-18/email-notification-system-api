@@ -1,0 +1,11 @@
+module.exports={
+    organizationCredentials:{
+        credentialType:{
+            email:1
+        },
+        status:{
+            active:1,
+            inactive:2
+        }
+    }
+}

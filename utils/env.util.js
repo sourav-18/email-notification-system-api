@@ -1,0 +1,6 @@
+
+module.exports = {
+    SERVER_PORT:process.env.SERVER_PORT,
+    SERVER_ENVIRONMENT: process.env.SERVER_ENVIRONMENT,
+    MONGODB_URL: process.env.MONGODB_URL,
+}
