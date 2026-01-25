@@ -1,16 +1,14 @@
-exports.success=({message, statusCode, data})=> {
+exports.success=({message, data})=> {
     return {
         status: 'success',
-        statusCode: statusCode,
         message: message,
         data: data??null
     };
 }
 
-exports.error=({message,statusCode, data,})=> {
+exports.error=({message, data,})=> {
     return {
         status: 'error',
-        statusCode: statusCode,
         message: message,
         data: data??null
     };
