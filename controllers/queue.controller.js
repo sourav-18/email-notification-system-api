@@ -40,7 +40,7 @@ exports.sendIdealMail = async () => {
         }).select({ emailUserName: 1, emailPassword: 1, notificationSendPercent: 1, emailRateLimit: 1 });
 
         if (organizationCredentialDbRes === null) return;
-        let limit = (organizationCredentialDbRes.notificationSendPercent.imidiate / 100) *
+        let limit = (organizationCredentialDbRes.notificationSendPercent.immediate / 100) *
             organizationCredentialDbRes.emailRateLimit;
 
         limit = limit ? limit : 0; //for safe
@@ -92,7 +92,7 @@ exports.sendAttemptMail = async () => {
         }).select({ emailUserName: 1, emailPassword: 1, notificationSendPercent: 1, emailRateLimit: 1 });
 
         if (organizationCredentialDbRes === null) return;
-        let limit = (organizationCredentialDbRes.notificationSendPercent.faild / 100) *
+        let limit = (organizationCredentialDbRes.notificationSendPercent.failed / 100) *
                 organizationCredentialDbRes.emailRateLimit;
 
         limit = limit ? limit : 0; //for safe

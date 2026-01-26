@@ -14,11 +14,11 @@ const db = new mongoose.Schema({
         required: true
     },
     notificationSendPercent: {
-        imidiate: {
+        immediate: {
             type: Number,
             default: 0
         },
-        faild: {
+        failed: {
             type: Number,
             default: 0
         }

@@ -34,3 +34,18 @@ exports.longString = (min ,max) => {
         "string.max": `{#key} must be at max {#limit} characters long.`,
     });
 }
+
+exports.numberRange = (min ,max) => {
+    if (!min) {
+        min = 1;
+    }
+    if (!max) {
+        max = 100;
+    }
+    return joi.number().min(min).max(max).messages({
+        "number.base": "{#key} should be number",
+        "any.required": "{#key} is required",
+        "number.min": `{#key} must be at least {#limit} characters long.`,
+        "number.max": `{#key} must be at max {#limit} characters long.`,
+    });
+}

@@ -1,7 +1,6 @@
 const router=require('express').Router();
 const organizationController=require('../controllers/organization.controller');
 
-router.post("/",organizationController.create);
-router.post("/add-credential",organizationController.addCredentials);
+router.post("/organizations/login",organizationController.login);
 
 module.exports = router;

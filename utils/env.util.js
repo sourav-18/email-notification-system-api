@@ -2,5 +2,13 @@
 module.exports = {
     SERVER_PORT:process.env.SERVER_PORT,
     SERVER_ENVIRONMENT: process.env.SERVER_ENVIRONMENT,
+    SERVER_APP_ID: process.env.SERVER_APP_ID,
+
     MONGODB_URL: process.env.MONGODB_URL,
+
+    SERVER_EMAIL_USERNAME:process.env.SERVER_EMAIL_USERNAME,
+    SERVER_EMAIL_PASSWORD:process.env.SERVER_EMAIL_PASSWORD,
+
+    JWT_SECRET_KEY:process.env.JWT_SECRET_KEY,
+    JWT_EXPIRE_IN:process.env.JWT_EXPIRE_IN,
 }

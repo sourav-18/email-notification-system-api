@@ -3,7 +3,7 @@ const notificationHistoryController = require("../controllers/notificationHistor
 const queueController = require("../controllers/queue.controller");
 const timeZone='Asia/Kolkata';
 
-//clear queue 
+//clear success queue 
 CronJob.from({
     cronTime: '*/15 * * * * *',
     onTick: () => {
@@ -13,7 +13,7 @@ CronJob.from({
     timeZone: timeZone
 })
 
-//clear queue 
+//clear multiple attempt (failed) queue 
 CronJob.from({
     cronTime: '*/15 * * * * *',
     onTick: () => {
@@ -23,6 +23,7 @@ CronJob.from({
     timeZone: timeZone
 })
 
+//send ideal mail 
 CronJob.from({
     cronTime: '*/3 * * * * *',
     onTick: () => {
@@ -32,6 +33,7 @@ CronJob.from({
     timeZone: timeZone
 })
 
+//send already attempt mail 
 CronJob.from({
     cronTime: '*/3 * * * * *',
     onTick: () => {

@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
-const queueController=require("../controllers/queue.controller");
+const queueController = require("../controllers/queue.controller");
 const mongoDbConstant = require("../db/mongo/constant.mongo");
+const envUtil = require("../utils/env.util");
 
 function getTransporter(user, pass) {
     return nodemailer.createTransport({
@@ -13,8 +14,8 @@ function getTransporter(user, pass) {
 }
 
 
-exports.sendMail = async ({notificationId,emailUserName, emailPassword, receiverEmailId, subject, text}) => {
-    const transporter = getTransporter(emailUserName,emailPassword);
+exports.sendMail = async ({ notificationId, emailUserName, emailPassword, receiverEmailId, subject, text }) => {
+    const transporter = getTransporter(emailUserName, emailPassword);
     const mailOptions = {
         from: emailUserName,
         to: receiverEmailId,
@@ -25,10 +26,45 @@ exports.sendMail = async ({notificationId,emailUserName, emailPassword, receiver
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log(error);
-            queueController.updateStatus(notificationId,mongoDbConstant.notificationQueue.status.attempt);
+            queueController.updateStatus(notificationId, mongoDbConstant.notificationQueue.status.attempt);
         } else {
             queueController.updateToSuccess(notificationId);
             console.log('Email sent: ' + info.response);
         }
     });
 };
+
+const transporter = getTransporter(envUtil.SERVER_EMAIL_USERNAME, envUtil.SERVER_EMAIL_PASSWORD);
+
+exports.sendOrganizationPassword = (organizationEmailId, password) => {
+    
+    const mailOptions = {
+        from: envUtil.SERVER_EMAIL_USERNAME,
+        to: organizationEmailId,
+        subject: 'Your Organization Account Credentials',
+        text: `Hello,
+
+Your organization account has been successfully created.
+
+Please find your login credentials below:
+
+Email: ${organizationEmailId}
+Password: ${password}
+
+For security reasons, we strongly recommend that you change your password after your first login.
+
+If you have any questions or need assistance, feel free to contact our support team.
+
+    Best regards,
+    Support Team`
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log('Error sending organization password email:', error);
+        } else {
+            // console.log('Organization password email sent: ' + info.response);
+        }
+    });
+
+}
