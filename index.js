@@ -8,6 +8,7 @@ const envUtil=require("./utils/env.util");
 const dateUtil=require("./utils/date.util");
 const mainRouter=require("./routes/main.route");
 const globalErrorHandlerMiddleware=require("./middlewares/globalErrorHandler.middleware");
+require("./cronJob/task.cronJob");
 
 //external middleware use
 app.use(express.json());
@@ -33,4 +34,3 @@ app.listen(envUtil.SERVER_PORT,(err)=>{
         console.log(serverStartInfo);
     }
 });
-

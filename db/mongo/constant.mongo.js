@@ -12,9 +12,10 @@ module.exports = {
         },
         status: {
             ideal: 1,
-            attempt: 2,
-            success: 3,
-            failed: 4
+            processing: 2,
+            attempt: 3,
+            success: 4,
+            failed: 5
         }
     }
 }

@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
-
+const queueController=require("../controllers/queue.controller");
+const mongoDbConstant = require("../db/mongo/constant.mongo");
 
 function getTransporter(user, pass) {
     return nodemailer.createTransport({
@@ -12,7 +13,7 @@ function getTransporter(user, pass) {
 }
 
 
-exports.sendMail = ({emailUserName, emailPassword, receiverEmailId, subject, text}) => {
+exports.sendMail = async ({notificationId,emailUserName, emailPassword, receiverEmailId, subject, text}) => {
     const transporter = getTransporter(emailUserName,emailPassword);
     const mailOptions = {
         from: emailUserName,
@@ -24,8 +25,10 @@ exports.sendMail = ({emailUserName, emailPassword, receiverEmailId, subject, tex
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log(error);
+            queueController.updateStatus(notificationId,mongoDbConstant.notificationQueue.status.attempt);
         } else {
+            queueController.updateToSuccess(notificationId);
             console.log('Email sent: ' + info.response);
         }
     });
-}
+};
