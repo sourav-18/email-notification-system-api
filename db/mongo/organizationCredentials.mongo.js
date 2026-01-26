@@ -10,6 +10,7 @@ const db = new mongoose.Schema({
     status: {
         type: Number,
         enum: [...Object.values(dbConstants.organizationCredentials.status)],
+        default:dbConstants.organizationCredentials.status.active,
         required: true
     },
     notificationSendPercent: {

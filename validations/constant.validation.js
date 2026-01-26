@@ -13,6 +13,12 @@ exports.emailId = joi.string().email().messages({
     "string.email": "{#key} should be a valid email address",
 })
 
+exports.uri=joi.string().uri().messages({
+    "string.base": "{#key} should be string",
+    "any.required": "{#key} must not be empty",
+    "string.uri": "{#key} should be a valid url",
+})
+
 exports.longString = (min ,max) => {
     if (!min) {
         min = 1;

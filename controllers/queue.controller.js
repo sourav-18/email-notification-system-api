@@ -2,8 +2,6 @@ const organizationCredentialDb = require("../db/mongo/organizationCredentials.mo
 const mongoDbConstant = require("../db/mongo/constant.mongo");
 const mailUtil = require("../utils/mail.util");
 const notificationQueueDb = require("../db/mongo/notificationQueue.db");
-const dateUtil = require("../utils/date.util");
-const organizationDb = require("../db/mongo/organization.db");
 
 
 async function getImmediateOrgIds(status) {
