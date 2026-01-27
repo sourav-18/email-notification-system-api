@@ -6,7 +6,6 @@ const app=express();
 
 const envUtil=require("./utils/env.util");
 const dateUtil=require("./utils/date.util");
-const mainRouter=require("./routes/main.route");
 const globalErrorHandlerMiddleware=require("./middlewares/globalErrorHandler.middleware");
 const authenticationMiddleware=require("./middlewares/authentication.middleware");
 
@@ -19,7 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // main router initialize
-app.use("/api/v1",authenticationMiddleware.checkAppId,mainRouter);
+app.use("/api/v1",authenticationMiddleware.checkAppId,require("./routes/main.route"));
+app.use("/api/v1/admin",authenticationMiddleware.checkAppId,require("./routes/admin.routes"));
 
 app.use(globalErrorHandlerMiddleware);
 

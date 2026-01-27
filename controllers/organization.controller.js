@@ -8,6 +8,7 @@ const mailUtil = require("../utils/mail.util");
 const jwt = require("jsonwebtoken");
 const constantUtils = require("../utils/constant.utils");
 const envUtil = require("../utils/env.util");
+const bcryptUtil=require("../utils/bcrypt.util");
 
 exports.addCredentials = async (req, res) => {
     const validation = organizationValidation.addCredentialBody.validate(req.body);
@@ -81,7 +82,7 @@ exports.login = async (req, res) => {
     const organizationDbRes = await organizationDb.findOne({ emailId: emailId })
         .select({ _id: 1, name: 1, emailId: 1, password: 1, logoUrl: 1, secretKey: 1 });
 
-    if (organizationDbRes === null || organizationDbRes.password !== password) {
+    if (organizationDbRes === null || bcryptUtil.comparePassword(password,organizationDbRes.password)===false) {
         throw new CustomError({
             message: "Invalid emailId or password",
             statusCode: 401
@@ -137,6 +138,14 @@ exports.createByAdmin = async (req, res) => {
     }
 
     const password = uuidUtils.getRandomId();
+    const hashedPassword=await bcryptUtil.encryptPassword(password);
+
+    if(!hashedPassword){
+        throw new CustomError({
+            message: "Could not create organization",
+            statusCode: 500
+        })
+    }
 
     await organizationDb.create({
         name: name,
@@ -144,7 +153,7 @@ exports.createByAdmin = async (req, res) => {
         description: description,
         logoUrl: logoUrl,
         secretKey: uuidUtils.getRandomId(),
-        password: password
+        password: hashedPassword
     })
 
     mailUtil.sendOrganizationPassword(emailId, password);

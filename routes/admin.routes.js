@@ -5,6 +5,6 @@ const organizationController=require('../controllers/organization.controller');
 
 
 //organization 
-router.post("/organizations",authenticationMiddleware.checkTokenForOrganization,organizationController.create);
+router.post("/organizations",authenticationMiddleware.checkTokenFoAdmin,organizationController.createByAdmin);
 
 module.exports = router;
