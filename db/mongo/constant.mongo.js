@@ -13,7 +13,7 @@ module.exports = {
         status: {
             ideal: 1,
             processing: 2,
-            attempt: 3,
+            error: 3,
             success: 4,
             failed: 5
         }

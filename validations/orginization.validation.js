@@ -9,7 +9,6 @@ exports.createBody=joi.object({
 })
 
 exports.addCredentialBody=joi.object({
-    organizationId:constantValidation.mongodbId.required(),
     emailUserName:constantValidation.emailId.required(),
     emailPassword:constantValidation.longString(10,30).required(),
     emailRateLimit:constantValidation.numberRange(0,200).required(),

@@ -40,7 +40,7 @@ exports.saveSuccessNotificationFromQueue = async () => {
 exports.saveFailedNotificationFromQueue = async () => {
     try {
         const histories = await notificationQueueDb.find({
-             status: mongoDbConstant.notificationQueue.status.attempt,
+             status: mongoDbConstant.notificationQueue.status.error,
              attemptCount:{$gt:4} 
             }).select({
             organizationId: 1,
@@ -51,6 +51,7 @@ exports.saveFailedNotificationFromQueue = async () => {
             attemptCount: 1,
             priority: 1,
             status: 1,
+            emailErrorMessage:1,
             successTime: 1,
             createdAt: 1
         }).limit(100).lean();

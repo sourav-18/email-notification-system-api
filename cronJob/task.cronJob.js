@@ -33,11 +33,11 @@ CronJob.from({
     timeZone: timeZone
 })
 
-//send already attempt mail 
+//send already attempt (error) mail 
 CronJob.from({
     cronTime: '*/3 * * * * *',
     onTick: () => {
-        queueController.sendAttemptMail();
+        queueController.sendErrorMail();
     },
     start: true,
     timeZone: timeZone

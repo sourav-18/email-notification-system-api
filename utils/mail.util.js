@@ -25,8 +25,8 @@ exports.sendMail = async ({ notificationId, emailUserName, emailPassword, receiv
 
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-            console.log(error);
-            queueController.updateStatus(notificationId, mongoDbConstant.notificationQueue.status.attempt);
+            console.log(error.message);
+            queueController.updateToError(notificationId, error.message);
         } else {
             queueController.updateToSuccess(notificationId);
             console.log('Email sent: ' + info.response);

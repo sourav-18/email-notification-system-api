@@ -78,9 +78,9 @@ exports.sendIdealMail = async () => {
 
 }
 
-exports.sendAttemptMail = async () => {
+exports.sendErrorMail = async () => {
 
-    const status = mongoDbConstant.notificationQueue.status.attempt;
+    const status = mongoDbConstant.notificationQueue.status.error;
 
     const organizationCredentialIds = await getImmediateOrgIds(status);
     if (organizationCredentialIds === null) return;
@@ -135,11 +135,14 @@ exports.sendAttemptMail = async () => {
 
 }
 
-exports.updateStatus = async (id, status) => {
+exports.updateToError = async (id,errorMessage) => {
     await notificationQueueDb.updateOne({
         _id: id
     }, {
-        $set: { status: status }
+        $set: { 
+            status: mongoDbConstant.notificationQueue.status.error,
+            emailErrorMessage: errorMessage
+         }
     })
 }
 
