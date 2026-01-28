@@ -1,12 +1,74 @@
 const notificationQueueDb = require("../db/mongo/notificationQueue.db");
 const notificationHistoryDb = require("../db/mongo/notificationHistory.db");
 const mongoDbConstant = require("../db/mongo/constant.mongo");
+const utilsConstant = require("../utils/constant.utils");
+const CustomError = require("../errors/customError");
+const responseUtil = require("../utils/response.util");
 
+exports.list = async (req, res) => {
+    const organizationId = req.headers.id;
+    const { skipNumber, limitNumber } = utilsConstant.getPaginationValues(req.query.page, req.query.limit);
+    const { sort, search,credentialId } = req.query;
+    const sortOption = { _id: -1 };
+    const allowedSortFields = ["_id", "attemptCount", "queueEntryTime", "successTime"];
+    utilsConstant.setSortOptions(sort, allowedSortFields, sortOption);
+   
+    const filterOptions = { organizationId: organizationId };
+
+    if (search) {
+        if (search.match(/^[0-9a-fA-F]{24}$/)) {
+            filterOptions._id = search;
+        } else {
+            filterOptions.$or = [
+                { receiverEmailId: { $regex: search, $options: 'i' } },
+                { subject: { $regex: search, $options: 'i' } },
+                { text: { $regex: search, $options: 'i' } }
+            ];
+        }
+    }
+
+    if(credentialId){
+        filterOptions.organizationCredentialId=credentialId;
+    }
+
+    const histories = await notificationHistoryDb.find(filterOptions)
+        .skip(skipNumber).limit(limitNumber).sort(sortOption)
+        .select({
+            _id:1,
+            receiverEmailId: 1,
+            subject: 1,
+            text: 1,
+            attemptCount: 1,
+            priority: 1,
+            status: 1,
+            emailErrorMessage: 1,
+            queueEntryTime: 1,
+            successTime: 1,
+        });
+
+         console.log(filterOptions,histories)
+
+    if (histories.length === 0) {
+        throw new CustomError({
+            message: "Notification histories not found",
+            statusCode: 404
+        })
+    }
+
+    return res.status(200).json(responseUtil.success({
+        message: "Notification histories fetched successfully",
+        data: histories
+    }))
+
+}
+
+
+//cron job
 exports.saveSuccessNotificationFromQueue = async () => {
     try {
         const histories = await notificationQueueDb.find({ status: mongoDbConstant.notificationQueue.status.success }).select({
             organizationId: 1,
-            organizationCredentialId:1,
+            organizationCredentialId: 1,
             receiverEmailId: 1,
             subject: 1,
             text: 1,
@@ -40,18 +102,18 @@ exports.saveSuccessNotificationFromQueue = async () => {
 exports.saveFailedNotificationFromQueue = async () => {
     try {
         const histories = await notificationQueueDb.find({
-             status: mongoDbConstant.notificationQueue.status.error,
-             attemptCount:{$gt:4} 
-            }).select({
+            status: mongoDbConstant.notificationQueue.status.error,
+            attemptCount: { $gt: 4 }
+        }).select({
             organizationId: 1,
-            organizationCredentialId:1,
+            organizationCredentialId: 1,
             receiverEmailId: 1,
             subject: 1,
             text: 1,
             attemptCount: 1,
             priority: 1,
             status: 1,
-            emailErrorMessage:1,
+            emailErrorMessage: 1,
             successTime: 1,
             createdAt: 1
         }).limit(100).lean();
@@ -60,7 +122,7 @@ exports.saveFailedNotificationFromQueue = async () => {
 
         for (const history of histories) {
             history.queueEntryTime = history.createdAt;
-            history.status=mongoDbConstant.notificationQueue.status.failed
+            history.status = mongoDbConstant.notificationQueue.status.failed
             delete history.createdAt;
             delete history._id;
         }

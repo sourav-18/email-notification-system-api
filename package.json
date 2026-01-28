@@ -20,6 +20,7 @@
   "homepage": "https://github.com/sourav-18/email-notification-system-api#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
     "cron": "^4.4.0",
     "dateformat": "^5.0.3",
     "dotenv": "^17.2.3",

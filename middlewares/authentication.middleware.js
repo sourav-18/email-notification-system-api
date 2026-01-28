@@ -41,6 +41,7 @@ exports.checkTokenFoAdmin = (req, res, next) => {
     }
 
     jwt.verify(token, envUtil.JWT_SECRET_KEY, (err, decoded) => {
+        console.log(decoded);
         if (err || decoded.role != constantUtil.keys.roles.admin) {
             throw new CustomError({
                 message: "Invalid token",
@@ -89,7 +90,6 @@ exports.checkTokenForOrganization = async(req, res, next) => {
                 statusCode: 400
             })
         }
-
         const isSecretKeyValid = await organizationDb.findOne({ _id: decoded.id, secretKey: secretKey }).select({ _id: 1 });
         if (!isSecretKeyValid) {
             throw new CustomError({

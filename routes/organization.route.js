@@ -2,6 +2,9 @@ const router=require('express').Router();
 const organizationController=require('../controllers/organization.controller');
 
 
-router.post("/add-credential",organizationController.addCredentials);
+router.post("/credentials",organizationController.addCredentials);
+router.get("/credentials",organizationController.credentialList);
+router.patch("/credentials/:credentialId/status/:status",organizationController.credentialStatusUpdate);
+router.put("/credentials/:credentialId",organizationController.editCredentials);
 
 module.exports = router;
