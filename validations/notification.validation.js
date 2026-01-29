@@ -7,3 +7,12 @@ exports.sendImmediateBody=joi.object({
     subject:constantValidation.longString(1,1000),
     text:constantValidation.longString(1,10000),
 })
+
+exports.listQuery=joi.object({
+    page:constantValidation.page,
+    limit:constantValidation.limit(),
+    search:constantValidation.longString(),
+    credentialId:constantValidation.mongodbId,
+    sort:constantValidation.longString()
+})
+

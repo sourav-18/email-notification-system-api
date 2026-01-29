@@ -145,6 +145,30 @@ exports.credentialList = async (req, res) => {
     }))
 }
 
+exports.credentialListForFilter=async (req, res) => {
+    const organizationId = req.headers.id;
+
+    const credentialList = await organizationCredentialsDb.find({ organizationId: organizationId })
+        .select({ _id: 1, emailUserName: 1}).lean();
+
+    credentialList.forEach((item)=>{
+        item.value=item.emailUserName;
+        delete item.emailUserName;
+    })
+    
+    if (credentialList.length === 0) {
+        throw new CustomError({
+            message: "Credential not found",
+            statusCode: 404
+        })
+    }
+
+    return res.status(200).json(responseUtil.success({
+        message: "Credential list fetched successfully",
+        data: credentialList
+    }))
+}
+
 exports.credentialStatusUpdate = async (req, res) => {
     const validation = organizationValidation.credentialStatusUpdateParams.validate(req.params);
     if (validation.error) {

@@ -58,3 +58,22 @@ exports.onlyNumber=(range)=>{
         "any.only": `{#key} must be one of {#valids}`,
     });
 }
+
+exports.page = joi.number().integer().min(1).integer().messages({
+    'number.base': '{#key} must be a number',
+    'number.empty': '{#key} is required',
+    'number.min': '{#key} should be at least {#limit}',
+    "number.integer": `{#key} must be an integer`
+})
+
+exports.limit = (mini, maxi) => {
+    mini = mini ? mini : 1;
+    maxi = maxi ? maxi : 30;
+    return joi.number().integer().min(mini).max(maxi).messages({
+        'number.base': 'limit must be a number',
+        'number.empty': 'limit is required',
+        'number.min': 'limit must be greater than or equal to {#limit}',
+        'number.max': 'limit must be less than or equal to {#limit}',
+        "number.integer": `{#key} must be an integer`
+    })
+}

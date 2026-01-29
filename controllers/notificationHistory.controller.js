@@ -4,15 +4,24 @@ const mongoDbConstant = require("../db/mongo/constant.mongo");
 const utilsConstant = require("../utils/constant.utils");
 const CustomError = require("../errors/customError");
 const responseUtil = require("../utils/response.util");
+const notificationValidation = require("../validations/notification.validation");
+const constantValidation = require("../validations/constant.validation");
 
 exports.list = async (req, res) => {
+    const validation = notificationValidation.listQuery.validate(req.query);
+    if (validation.error) {
+        throw new CustomError({
+            message: validation.error.message,
+            statusCode: 400
+        })
+    }
     const organizationId = req.headers.id;
     const { skipNumber, limitNumber } = utilsConstant.getPaginationValues(req.query.page, req.query.limit);
-    const { sort, search,credentialId } = req.query;
-    const sortOption = { _id: -1 };
+    const { sort, search, credentialId } = req.query;
+    const sortOption = {};
     const allowedSortFields = ["_id", "attemptCount", "queueEntryTime", "successTime"];
     utilsConstant.setSortOptions(sort, allowedSortFields, sortOption);
-   
+
     const filterOptions = { organizationId: organizationId };
 
     if (search) {
@@ -27,17 +36,17 @@ exports.list = async (req, res) => {
         }
     }
 
-    if(credentialId){
-        filterOptions.organizationCredentialId=credentialId;
+    if (credentialId) {
+        filterOptions.organizationCredentialId = credentialId;
     }
 
-    const histories = await notificationHistoryDb.find(filterOptions)
+    let totalCount = notificationHistoryDb.countDocuments(filterOptions);
+    let histories = notificationHistoryDb.find(filterOptions)
         .skip(skipNumber).limit(limitNumber).sort(sortOption)
         .select({
-            _id:1,
+            _id: 1,
             receiverEmailId: 1,
             subject: 1,
-            text: 1,
             attemptCount: 1,
             priority: 1,
             status: 1,
@@ -46,7 +55,9 @@ exports.list = async (req, res) => {
             successTime: 1,
         });
 
-         console.log(filterOptions,histories)
+    const promises = await Promise.all([histories, totalCount]);
+    histories = promises[0];
+    totalCount = promises[1];
 
     if (histories.length === 0) {
         throw new CustomError({
@@ -57,9 +68,23 @@ exports.list = async (req, res) => {
 
     return res.status(200).json(responseUtil.success({
         message: "Notification histories fetched successfully",
-        data: histories
+        data: {
+            items: histories,
+            totalCount: totalCount
+        }
     }))
 
+}
+
+exports.detailsById = async (req, res) => {
+    // const validation = constantValidation.mongodbId.r
+    if (validation.error) {
+        throw new CustomError({
+            message: validation.error.message,
+            statusCode: 400
+        })
+    }
+    const organizationId = req.headers.id;
 }
 
 
