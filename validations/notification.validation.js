@@ -1,11 +1,15 @@
 const joi=require("joi");
 const constantValidation=require("./constant.validation");
+const mongDbConstant=require("../db/mongo/constant.mongo");
 
-exports.sendImmediateBody=joi.object({
+exports.sendBody=joi.object({
     organizationCredentialId:constantValidation.mongodbId.required(),
-    receiverEmailId:constantValidation.emailId.required(),
+    to:constantValidation.emailId.required(),
     subject:constantValidation.longString(1,1000),
     text:constantValidation.longString(1,10000),
+    priority:constantValidation.onlyNumber
+    (Object.values(mongDbConstant.notificationQueue.priority)).required(),
+    scheduleTime:constantValidation.dateTime
 })
 
 exports.listQuery=joi.object({
@@ -15,4 +19,9 @@ exports.listQuery=joi.object({
     credentialId:constantValidation.mongodbId,
     sort:constantValidation.longString()
 })
+
+exports.detailsByIdParams=joi.object({
+    id:constantValidation.mongodbId.required()
+})
+
 

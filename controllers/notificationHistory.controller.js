@@ -50,7 +50,6 @@ exports.list = async (req, res) => {
             attemptCount: 1,
             priority: 1,
             status: 1,
-            emailErrorMessage: 1,
             queueEntryTime: 1,
             successTime: 1,
         });
@@ -77,7 +76,7 @@ exports.list = async (req, res) => {
 }
 
 exports.detailsById = async (req, res) => {
-    // const validation = constantValidation.mongodbId.r
+    const validation = notificationValidation.detailsByIdParams.validate(req.params);
     if (validation.error) {
         throw new CustomError({
             message: validation.error.message,
@@ -85,24 +84,46 @@ exports.detailsById = async (req, res) => {
         })
     }
     const organizationId = req.headers.id;
-}
-
-
-//cron job
-exports.saveSuccessNotificationFromQueue = async () => {
-    try {
-        const histories = await notificationQueueDb.find({ status: mongoDbConstant.notificationQueue.status.success }).select({
-            organizationId: 1,
-            organizationCredentialId: 1,
+    const notification = await notificationHistoryDb.findOne({ _id: req.params.id, organizationId: organizationId })
+        .populate({ path: "organizationCredentialId", select: { emailUserName: 1 } })
+        .select({
+            _id: 1,
             receiverEmailId: 1,
             subject: 1,
             text: 1,
             attemptCount: 1,
-            priority: 1,
             status: 1,
+            organizationCredentialId: 1,
+            emailErrorMessage: 1,
+            queueEntryTime: 1,
             successTime: 1,
-            createdAt: 1
-        }).limit(100).lean();
+        }).lean()
+
+    if (notification == null) {
+        throw new CustomError({
+            message: "Notification histories not found",
+            statusCode: 404
+        })
+    }
+
+    if (notification.organizationCredentialId) {
+        notification.from = notification.organizationCredentialId.emailUserName;
+        delete notification.organizationCredentialId;
+    }
+
+    return res.status(200).json(responseUtil.success({
+        message: "Notification histories details fetched successfully",
+        data: notification
+    }))
+}
+
+
+//cron job
+
+exports.saveSuccessNotificationFromQueue = async () => {
+    try {
+        const histories = await notificationQueueDb.find({ status: mongoDbConstant.notificationQueue.status.success })
+        .select(getSaveSelectFiled()).limit(100).lean();
 
         const notificationIds = histories.map(item => item._id);
 
@@ -129,19 +150,7 @@ exports.saveFailedNotificationFromQueue = async () => {
         const histories = await notificationQueueDb.find({
             status: mongoDbConstant.notificationQueue.status.error,
             attemptCount: { $gt: 4 }
-        }).select({
-            organizationId: 1,
-            organizationCredentialId: 1,
-            receiverEmailId: 1,
-            subject: 1,
-            text: 1,
-            attemptCount: 1,
-            priority: 1,
-            status: 1,
-            emailErrorMessage: 1,
-            successTime: 1,
-            createdAt: 1
-        }).limit(100).lean();
+        }).select(getSaveSelectFiled()).limit(100).lean();
 
         const notificationIds = histories.map(item => item._id);
 
@@ -162,4 +171,22 @@ exports.saveFailedNotificationFromQueue = async () => {
         console.log(error);
     }
 
+}
+
+
+function getSaveSelectFiled() {
+    return {
+        organizationId: 1,
+        organizationCredentialId: 1,
+        receiverEmailId: 1,
+        subject: 1,
+        text: 1,
+        attemptCount: 1,
+        priority: 1,
+        status: 1,
+        emailErrorMessage: 1,
+        successTime: 1,
+        createdAt: 1,
+        scheduleTime: 1
+    }
 }

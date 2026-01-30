@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const constantUtils = require("../utils/constant.utils");
 const envUtil = require("../utils/env.util");
 const bcryptUtil = require("../utils/bcrypt.util");
+const mongoDbConstant = require("../db/mongo/constant.mongo");
 
 exports.addCredentials = async (req, res) => {
     const validation = organizationValidation.addCredentialBody.validate(req.body);
@@ -62,7 +63,7 @@ exports.addCredentials = async (req, res) => {
 exports.editCredentials = async (req, res) => {
     const validation1 = organizationValidation.editCredentialBody.validate(req.body);
     const validation2 = organizationValidation.editCredentialPrams.validate(req.params);
-    const validation=validation1.error?validation1:validation2;
+    const validation = validation1.error ? validation1 : validation2;
 
     if (validation.error) {
         throw new CustomError({
@@ -87,7 +88,7 @@ exports.editCredentials = async (req, res) => {
         })
     }
 
-    const isCredentialExist = await organizationCredentialsDb.findOne({_id:credentialId, organizationId:organizationId}).select({ _id: 1 });
+    const isCredentialExist = await organizationCredentialsDb.findOne({ _id: credentialId, organizationId: organizationId }).select({ _id: 1 });
     if (isCredentialExist === null) {
         throw new CustomError({
             message: "credential is not found",
@@ -145,17 +146,19 @@ exports.credentialList = async (req, res) => {
     }))
 }
 
-exports.credentialListForFilter=async (req, res) => {
+exports.credentialListForFilter = async (req, res) => {
     const organizationId = req.headers.id;
 
-    const credentialList = await organizationCredentialsDb.find({ organizationId: organizationId })
-        .select({ _id: 1, emailUserName: 1}).lean();
+    const credentialList = await organizationCredentialsDb.find({
+        organizationId: organizationId,
+        status: mongoDbConstant.organizationCredentials.status.active
+    }).select({ _id: 1, emailUserName: 1 }).lean();
 
-    credentialList.forEach((item)=>{
-        item.value=item.emailUserName;
+    credentialList.forEach((item) => {
+        item.value = item.emailUserName;
         delete item.emailUserName;
     })
-    
+
     if (credentialList.length === 0) {
         throw new CustomError({
             message: "Credential not found",

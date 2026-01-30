@@ -27,10 +27,63 @@ async function getImmediateOrgIds(status) {
     return notificationQueueDbRes.map(item => item._id);
 }
 
-exports.sendIdealMail = async () => {
+async function getScheduleOrgIds(status) {
+    const aggregationArray = [];
+
+    const matchPipeline = {
+        $match: {
+            status: status,
+            priority: mongoDbConstant.notificationQueue.priority.schedule,
+            scheduleTime: { $lte: new Date() }
+        }
+    };
+    const groupPipeline = {
+        $group: {
+            _id: "$organizationCredentialId"
+        }
+    };
+
+    aggregationArray.push(matchPipeline);
+    aggregationArray.push(groupPipeline);
+
+    const notificationQueueDbRes = await notificationQueueDb.aggregate(aggregationArray).exec();
+    if (notificationQueueDbRes.length === 0) return null;
+    return notificationQueueDbRes.map(item => item._id);
+}
+
+async function getErrorOrgIds() {
+    const aggregationArray = [];
+
+    const matchPipeline = {
+        $match: {
+            status:  mongoDbConstant.notificationQueue.status.error,
+        }
+    };
+    const groupPipeline = {
+        $group: {
+            _id: "$organizationCredentialId"
+        }
+    };
+
+    aggregationArray.push(matchPipeline);
+    aggregationArray.push(groupPipeline);
+
+    const notificationQueueDbRes = await notificationQueueDb.aggregate(aggregationArray).exec();
+    if (notificationQueueDbRes.length === 0) return null;
+    return notificationQueueDbRes.map(item => item._id);
+}
+
+exports.sendIdealMail = async (priority) => {
     const status = mongoDbConstant.notificationQueue.status.ideal;
 
-    const organizationCredentialIds = await getImmediateOrgIds(status);
+    let organizationCredentialIds = null;
+
+    if (priority === mongoDbConstant.notificationQueue.priority.immediate) {
+        organizationCredentialIds = await getImmediateOrgIds(status);
+    } else if (priority === mongoDbConstant.notificationQueue.priority.schedule) {
+        organizationCredentialIds = await getScheduleOrgIds(status);
+    }
+
     if (organizationCredentialIds === null) return;
 
     for (const orgCredId of organizationCredentialIds) {
@@ -38,7 +91,7 @@ exports.sendIdealMail = async () => {
             _id: orgCredId,
             status: mongoDbConstant.organizationCredentials.status.active
         }).select({ emailUserName: 1, emailPassword: 1, notificationSendPercent: 1, emailRateLimit: 1 });
-
+        
         if (organizationCredentialDbRes === null) return;
         let limit = (organizationCredentialDbRes.notificationSendPercent.immediate / 100) *
             organizationCredentialDbRes.emailRateLimit;
@@ -47,11 +100,11 @@ exports.sendIdealMail = async () => {
 
         const notificationQueueDbRes = await notificationQueueDb.find({
             organizationCredentialId: orgCredId,
-            priority: mongoDbConstant.notificationQueue.priority.immediate,
+            priority: priority,
             status: status
         }).select({ receiverEmailId: 1, subject: 1, text: 1 })
             .sort({ _id: 1 })
-            .limit(limit); 
+            .limit(limit);
 
         if (notificationQueueDbRes === null || notificationQueueDbRes.length === 0) continue;
 
@@ -59,7 +112,7 @@ exports.sendIdealMail = async () => {
             const isIdeal = await notificationQueueDb.updateOne({ _id: notification.id, status: status }, {
                 $set: {
                     status: mongoDbConstant.notificationQueue.status.processing,
-                    lastAttemptTime:Date.now()
+                    lastAttemptTime: Date.now()
                 },
                 $inc: { attemptCount: 1 }
             }); // it insure that same notification not send twice
@@ -82,7 +135,7 @@ exports.sendErrorMail = async () => {
 
     const status = mongoDbConstant.notificationQueue.status.error;
 
-    const organizationCredentialIds = await getImmediateOrgIds(status);
+    const organizationCredentialIds = await getErrorOrgIds();
     if (organizationCredentialIds === null) return;
 
     for (const orgCredId of organizationCredentialIds) {
@@ -93,20 +146,19 @@ exports.sendErrorMail = async () => {
 
         if (organizationCredentialDbRes === null) return;
         let limit = (organizationCredentialDbRes.notificationSendPercent.failed / 100) *
-                organizationCredentialDbRes.emailRateLimit;
+            organizationCredentialDbRes.emailRateLimit;
 
         limit = limit ? limit : 0; //for safe
-        let beforeTime=new Date();
-        beforeTime.setHours(beforeTime.getHours()-1);
+        let beforeTime = new Date();
+        beforeTime.setHours(beforeTime.getHours() - 1);
 
         const notificationQueueDbRes = await notificationQueueDb.find({
             organizationCredentialId: orgCredId,
-            priority: mongoDbConstant.notificationQueue.priority.immediate,
-            lastAttemptTime:{$lte:beforeTime},
+            lastAttemptTime: { $lte: beforeTime },
             status: status
-        }).select({ receiverEmailId: 1, subject: 1, text: 1,lastAttemptTime:1 })
+        }).select({ receiverEmailId: 1, subject: 1, text: 1, lastAttemptTime: 1 })
             .sort({ _id: 1 })
-            .limit(limit); 
+            .limit(limit);
 
         if (notificationQueueDbRes === null || notificationQueueDbRes.length === 0) continue;
 
@@ -114,7 +166,7 @@ exports.sendErrorMail = async () => {
             const isIdeal = await notificationQueueDb.updateOne({ _id: notification.id, status: status }, {
                 $set: {
                     status: mongoDbConstant.notificationQueue.status.processing,
-                    lastAttemptTime:Date.now()
+                    lastAttemptTime: Date.now()
                 },
                 $inc: { attemptCount: 1 }
             }); // it insure that same notification not send twice
@@ -135,14 +187,14 @@ exports.sendErrorMail = async () => {
 
 }
 
-exports.updateToError = async (id,errorMessage) => {
+exports.updateToError = async (id, errorMessage) => {
     await notificationQueueDb.updateOne({
         _id: id
     }, {
-        $set: { 
+        $set: {
             status: mongoDbConstant.notificationQueue.status.error,
             emailErrorMessage: errorMessage
-         }
+        }
     })
 }
 

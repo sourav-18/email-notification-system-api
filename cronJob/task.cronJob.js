@@ -2,6 +2,7 @@ const { CronJob } = require("cron");
 const notificationHistoryController = require("../controllers/notificationHistory.controller");
 const queueController = require("../controllers/queue.controller");
 const timeZone='Asia/Kolkata';
+const mongoDbConstant = require("../db/mongo/constant.mongo");
 
 //clear success queue 
 CronJob.from({
@@ -23,11 +24,21 @@ CronJob.from({
     timeZone: timeZone
 })
 
-//send ideal mail 
+//send Immediate ideal mail 
 CronJob.from({
     cronTime: '*/3 * * * * *',
     onTick: () => {
-        queueController.sendIdealMail();
+        // queueController.sendIdealMail(mongoDbConstant.notificationQueue.priority.immediate);
+    },
+    start: true,
+    timeZone: timeZone
+})
+
+//send Schedule ideal mail 
+CronJob.from({
+    cronTime: '*/5 * * * * *',
+    onTick: () => {
+        queueController.sendIdealMail(mongoDbConstant.notificationQueue.priority.schedule);
     },
     start: true,
     timeZone: timeZone

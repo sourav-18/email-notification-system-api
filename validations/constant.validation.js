@@ -77,3 +77,9 @@ exports.limit = (mini, maxi) => {
         "number.integer": `{#key} must be an integer`
     })
 }
+
+exports.dateTime = joi.string().trim().pattern(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/).messages({
+    "string.pattern.base": "{#key} date must be in YYYY-MM-DD HH:MM format",
+    "date.invalid": "{#key} date must be a valid date",
+    "any.required": "{#key} required",
+})

@@ -8,7 +8,7 @@ module.exports = {
     notificationQueue: {
         priority: {
             immediate: 1,
-            grouping: 2
+            schedule: 2
         },
         status: {
             ideal: 1,
