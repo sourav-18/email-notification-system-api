@@ -41,7 +41,6 @@ exports.checkTokenFoAdmin = (req, res, next) => {
     }
 
     jwt.verify(token, envUtil.JWT_SECRET_KEY, (err, decoded) => {
-        console.log(decoded);
         if (err || decoded.role != constantUtil.keys.roles.admin) {
             throw new CustomError({
                 message: "Invalid token",
@@ -50,7 +49,6 @@ exports.checkTokenFoAdmin = (req, res, next) => {
         }
         req.headers.id = decoded.id;
         req.headers.role = decoded.role;
-        console.log(req.headers);
         next();
     });
 

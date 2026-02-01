@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const conn = require("./conn.mongo");
+const dbConstants = require("./constant.mongo");
 
 const db = new mongoose.Schema({
     name: { type: String, required: true},
@@ -9,6 +9,9 @@ const db = new mongoose.Schema({
     logoUrl: { type: String, required: true },
     secretKey: { type: String, required: true },
     lastLoginTime: { type: Date },
+    status:{type:Number,default:dbConstants.organization.status.active},
+    updatedBy: {type: mongoose.Types.ObjectId, ref: "organizations"}
+
 },
     { timestamps: true }
 );

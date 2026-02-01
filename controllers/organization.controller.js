@@ -2,9 +2,7 @@ const organizationDb = require("../db/mongo/organization.db");
 const organizationCredentialsDb = require("../db/mongo/organizationCredentials.mongo");
 const CustomError = require("../errors/customError");
 const responseUtil = require("../utils/response.util");
-const organizationValidation = require("../validations/orginization.validation");
-const uuidUtils = require("../utils/uuid.util");
-const mailUtil = require("../utils/mail.util");
+const organizationValidation = require("../validations/organization.validation");
 const jwt = require("jsonwebtoken");
 const constantUtils = require("../utils/constant.utils");
 const envUtil = require("../utils/env.util");
@@ -249,52 +247,4 @@ exports.login = async (req, res) => {
             token: token,
         }
     }))
-}
-
-
-exports.createByAdmin = async (req, res) => {
-    const validation = organizationValidation.createBody.validate(req.body);
-    if (validation.error) {
-        throw new CustomError({
-            message: validation.error.message,
-            statusCode: 400
-        })
-    }
-
-    const { name, description, logoUrl, emailId } = req.body;
-    const isNameAlreadyExist = await organizationDb.findOne({ emailId: emailId });
-
-    if (isNameAlreadyExist) {
-        throw new CustomError({
-            message: "email already exist",
-            statusCode: 400
-        })
-    }
-
-    const password = uuidUtils.getRandomId();
-    const hashedPassword = await bcryptUtil.encryptPassword(password);
-
-    if (!hashedPassword) {
-        throw new CustomError({
-            message: "Could not create organization",
-            statusCode: 500
-        })
-    }
-
-    await organizationDb.create({
-        name: name,
-        emailId: emailId,
-        description: description,
-        logoUrl: logoUrl,
-        secretKey: uuidUtils.getRandomId(),
-        password: hashedPassword
-    })
-
-    mailUtil.sendOrganizationPassword(emailId, password);
-
-    return res.status(201).json(responseUtil.success({
-        message: "organization crate successfully",
-        data: null
-    }))
-
 }

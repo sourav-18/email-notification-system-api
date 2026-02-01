@@ -1,11 +1,11 @@
-const CustomError = require("../errors/customError");
-const adminValidation = require("../validations/admin.validation");
-const responseUtil = require("../utils/response.util");
-const adminDb = require("../db/mongo/admin.db");
+const CustomError = require("../../errors/customError");
+const adminValidation = require("../../validations/admin.validation");
+const responseUtil = require("../../utils/response.util");
+const adminDb = require("../../db/mongo/admin.db");
 const jwt = require("jsonwebtoken");
-const envUtil = require("../utils/env.util");
-const constantUtils = require("../utils/constant.utils");
-const bcryptUtil=require("../utils/bcrypt.util");
+const envUtil = require("../../utils/env.util");
+const constantUtils = require("../../utils/constant.utils");
+const bcryptUtil=require("../../utils/bcrypt.util");
 
 exports.login = async (req, res) => {
 
