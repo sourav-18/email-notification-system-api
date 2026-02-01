@@ -13,6 +13,7 @@ const db = new mongoose.Schema({
         successTime: {type: Date},
         emailErrorMessage: {type: String},
         scheduleTime:{type: Date},
+        queueEntryTime:{type: Date},
         priority: {
             type: Number,
             required: true,

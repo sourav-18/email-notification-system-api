@@ -112,7 +112,8 @@ exports.sendIdealMail = async (priority) => {
             const isIdeal = await notificationQueueDb.updateOne({ _id: notification.id, status: status }, {
                 $set: {
                     status: mongoDbConstant.notificationQueue.status.processing,
-                    lastAttemptTime: Date.now()
+                    lastAttemptTime: Date.now(),
+                    queueEntryTime: Date.now(),
                 },
                 $inc: { attemptCount: 1 }
             }); // it insure that same notification not send twice

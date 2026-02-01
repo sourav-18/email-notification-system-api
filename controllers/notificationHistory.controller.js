@@ -17,7 +17,7 @@ exports.list = async (req, res) => {
     }
     const organizationId = req.headers.id;
     const { skipNumber, limitNumber } = utilsConstant.getPaginationValues(req.query.page, req.query.limit);
-    const { sort, search, credentialId } = req.query;
+    const { sort, search, credentialId,status } = req.query;
     const sortOption = {};
     const allowedSortFields = ["_id", "attemptCount", "queueEntryTime", "successTime"];
     utilsConstant.setSortOptions(sort, allowedSortFields, sortOption);
@@ -40,6 +40,10 @@ exports.list = async (req, res) => {
         filterOptions.organizationCredentialId = credentialId;
     }
 
+    if (status) {
+        filterOptions.status = status;
+    }
+
     let totalCount = notificationHistoryDb.countDocuments(filterOptions);
     let histories = notificationHistoryDb.find(filterOptions)
         .skip(skipNumber).limit(limitNumber).sort(sortOption)
@@ -51,7 +55,7 @@ exports.list = async (req, res) => {
             priority: 1,
             status: 1,
             queueEntryTime: 1,
-            successTime: 1,
+            successTime: 1
         });
 
     const promises = await Promise.all([histories, totalCount]);
@@ -96,7 +100,8 @@ exports.detailsById = async (req, res) => {
             organizationCredentialId: 1,
             emailErrorMessage: 1,
             queueEntryTime: 1,
-            successTime: 1,
+            scheduleTime: 1,
+            successTime: 1
         }).lean()
 
     if (notification == null) {
@@ -123,12 +128,11 @@ exports.detailsById = async (req, res) => {
 exports.saveSuccessNotificationFromQueue = async () => {
     try {
         const histories = await notificationQueueDb.find({ status: mongoDbConstant.notificationQueue.status.success })
-        .select(getSaveSelectFiled()).limit(100).lean();
+            .select(getSaveSelectFiled()).limit(100).lean();
 
         const notificationIds = histories.map(item => item._id);
 
         for (const history of histories) {
-            history.queueEntryTime = history.createdAt;
             delete history.createdAt;
             delete history._id;
         }
@@ -155,7 +159,6 @@ exports.saveFailedNotificationFromQueue = async () => {
         const notificationIds = histories.map(item => item._id);
 
         for (const history of histories) {
-            history.queueEntryTime = history.createdAt;
             history.status = mongoDbConstant.notificationQueue.status.failed
             delete history.createdAt;
             delete history._id;
@@ -187,6 +190,7 @@ function getSaveSelectFiled() {
         emailErrorMessage: 1,
         successTime: 1,
         createdAt: 1,
-        scheduleTime: 1
+        scheduleTime: 1,
+        queueEntryTime: 1
     }
 }

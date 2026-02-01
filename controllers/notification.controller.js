@@ -15,7 +15,7 @@ exports.send = async (req, res) => {
         })
     }
 
-    const { organizationCredentialId, to: receiverEmailId, subject, text,priority,scheduleTime } = req.body;
+    const { organizationCredentialId, to: receiverEmailId, subject, text, priority, scheduleTime } = req.body;
 
     const organizationCredentialDbRes = await organizationCredentialDb
         .findOne({
@@ -38,7 +38,7 @@ exports.send = async (req, res) => {
         subject: subject,
         text: text,
         priority: priority,
-        scheduleTime:scheduleTime
+        scheduleTime: scheduleTime
     });
 
     return res.status(202).json(responseUtil.success({
@@ -58,9 +58,9 @@ exports.list = async (req, res) => {
     }
     const organizationId = req.headers.id;
     const { skipNumber, limitNumber } = utilsConstant.getPaginationValues(req.query.page, req.query.limit);
-    const { sort, search, credentialId } = req.query;
+    const { sort, search, credentialId,status } = req.query;
     const sortOption = {};
-    const allowedSortFields = ["_id", "attemptCount", "queueEntryTime", "successTime"];
+    const allowedSortFields = ["_id", "attemptCount", "queueEntryTime", "scheduleTime"];
     utilsConstant.setSortOptions(sort, allowedSortFields, sortOption);
 
     const filterOptions = { organizationId: organizationId };
@@ -81,6 +81,10 @@ exports.list = async (req, res) => {
         filterOptions.organizationCredentialId = credentialId;
     }
 
+    if (status) {
+        filterOptions.status = status;
+    }
+
     let totalCount = notificationQueueDb.countDocuments(filterOptions);
     let notifications = notificationQueueDb.find(filterOptions)
         .skip(skipNumber).limit(limitNumber).sort(sortOption)
@@ -93,6 +97,7 @@ exports.list = async (req, res) => {
             status: 1,
             queueEntryTime: 1,
             successTime: 1,
+            scheduleTime: 1,
             createdAt: 1,
         }).lean();
 
@@ -107,20 +112,20 @@ exports.list = async (req, res) => {
         })
     }
 
-    for (const item of notifications) {
-        item.queueEntryTime = item.createdAt;
-        delete item.createdAt;
-    }
+    // for (const item of notifications) {
+    //     item.queueEntryTime = item.createdAt;
+    //     delete item.createdAt;
+    // }
 
 
 
-return res.status(200).json(responseUtil.success({
-    message: "Queue notification fetched successfully",
-    data: {
-        items: notifications,
-        totalCount: totalCount
-    }
-}))
+    return res.status(200).json(responseUtil.success({
+        message: "Queue notification fetched successfully",
+        data: {
+            items: notifications,
+            totalCount: totalCount
+        }
+    }))
 
 }
 
@@ -145,6 +150,8 @@ exports.detailsById = async (req, res) => {
             organizationCredentialId: 1,
             emailErrorMessage: 1,
             successTime: 1,
+            scheduleTime: 1,
+            queueEntryTime: 1,
             createdAt: 1
         }).lean()
 
@@ -159,11 +166,37 @@ exports.detailsById = async (req, res) => {
         notification.from = notification.organizationCredentialId.emailUserName;
         delete notification.organizationCredentialId;
     }
-    notification.queueEntryTime = notification.createdAt;
-    delete notification.createdAt;
 
     return res.status(200).json(responseUtil.success({
         message: "Queue notification details fetched successfully",
         data: notification
+    }))
+}
+
+exports.cancel = async (req, res) => {
+    const validation = notificationValidation.cancelByIdParams.validate(req.params);
+    if (validation.error) {
+        throw new CustomError({
+            message: validation.error.message,
+            statusCode: 400
+        })
+    }
+
+    const organizationId = req.headers.id;
+    const updateDbRes = await notificationQueueDb.updateOne({
+        _id: req.params.id,
+        organizationId: organizationId
+    }, { $set: { status: mongoDbConstant.notificationQueue.status.cancel } });
+
+    if (updateDbRes.matchedCount === 0) {
+        throw new CustomError({
+            message: "notification not found",
+            statusCode: 404
+        })
+    }
+
+    return res.status(200).json(responseUtil.success({
+        message: "notification cancel successfully",
+        data: null
     }))
 }

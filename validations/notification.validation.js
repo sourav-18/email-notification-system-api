@@ -17,10 +17,15 @@ exports.listQuery=joi.object({
     limit:constantValidation.limit(),
     search:constantValidation.longString(),
     credentialId:constantValidation.mongodbId,
-    sort:constantValidation.longString()
+    sort:constantValidation.longString(),
+    status:constantValidation.onlyNumber(Object.values(mongDbConstant.notificationQueue.status))
 })
 
 exports.detailsByIdParams=joi.object({
+    id:constantValidation.mongodbId.required()
+})
+
+exports.cancelByIdParams=joi.object({
     id:constantValidation.mongodbId.required()
 })
 

@@ -28,7 +28,7 @@ CronJob.from({
 CronJob.from({
     cronTime: '*/3 * * * * *',
     onTick: () => {
-        // queueController.sendIdealMail(mongoDbConstant.notificationQueue.priority.immediate);
+        queueController.sendIdealMail(mongoDbConstant.notificationQueue.priority.immediate);
     },
     start: true,
     timeZone: timeZone
