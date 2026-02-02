@@ -3,6 +3,7 @@ const organizationController=require('../controllers/organization.controller');
 const adminController=require('../controllers/admin/admin.controller');
 
 router.post("/organizations/login",organizationController.login);
+router.post("/organizations/signup",organizationController.create);
 router.post("/admins/login",adminController.login);
 
 module.exports = router;

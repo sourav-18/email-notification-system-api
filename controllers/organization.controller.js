@@ -8,6 +8,71 @@ const constantUtils = require("../utils/constant.utils");
 const envUtil = require("../utils/env.util");
 const bcryptUtil = require("../utils/bcrypt.util");
 const mongoDbConstant = require("../db/mongo/constant.mongo");
+const uuidUtils = require("../utils/uuid.util");
+const serverEnvUtil = require("../utils/env.util");
+
+exports.create = async (req, res) => {
+    const validation = organizationValidation.createBody.validate(req.body);
+    if (validation.error) {
+        throw new CustomError({
+            message: validation.error.message,
+            statusCode: 400
+        })
+    }
+
+    const { name, emailId, password } = req.body;
+    const isNameAlreadyExist = await organizationDb.findOne({ emailId: emailId });
+
+    if (isNameAlreadyExist) {
+        throw new CustomError({
+            message: "email already exist",
+            statusCode: 400
+        })
+    }
+
+    const hashedPassword = await bcryptUtil.encryptPassword(password);
+
+    if (!hashedPassword) {
+        throw new CustomError({
+            message: "Could not create organization",
+            statusCode: 500
+        })
+    }
+
+    const organizationDbRes = await organizationDb.create({
+        name: name,
+        emailId: emailId,
+        secretKey: uuidUtils.getRandomId(),
+        password: hashedPassword
+    })
+
+    const token = jwt.sign({
+        id: organizationDbRes._id,
+        role: constantUtils.keys.roles.organization
+    }, envUtil.JWT_SECRET_KEY, { expiresIn: envUtil.JWT_EXPIRE_IN });
+
+    if (!token) {
+        throw new CustomError({
+            message: "Could not generate token",
+            statusCode: 500
+        })
+    }
+
+    if (serverEnvUtil.SERVER_ENVIRONMENT == "prod")
+        mailUtil.sendOrganizationPassword(emailId, password);
+
+    return res.status(201).json(responseUtil.success({
+        message: "organization crate successfully",
+        data: {
+            id: organizationDbRes._id,
+            name: organizationDbRes.name,
+            emailId: organizationDbRes.emailId,
+            secretKey: organizationDbRes.secretKey,
+            token: token
+        }
+    }))
+
+}
 
 exports.addCredentials = async (req, res) => {
     const validation = organizationValidation.addCredentialBody.validate(req.body);

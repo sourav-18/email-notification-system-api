@@ -7,7 +7,7 @@ const uuidUtils = require("../../utils/uuid.util");
 const mailUtil = require("../../utils/mail.util");
 const bcryptUtil = require("../../utils/bcrypt.util");
 const serverEnvUtil = require("../../utils/env.util");
-const organizationCredentialsDb = require("../../db/mongo/organizationCredentials.mongo");
+
 
 exports.list = async (req, res) => {
 

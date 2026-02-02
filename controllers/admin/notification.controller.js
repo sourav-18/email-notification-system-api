@@ -210,14 +210,18 @@ exports.historyDetailsById = async (req, res) => {
     }
 
     if (notification.organizationCredentialId) {
+        notification.from = notification.organizationCredentialId.emailUserName;
+        delete notification.organizationCredentialId;
+    }
+
+    if (notification.organizationId) {
         notification.organizationEmail = notification.organizationId?.emailId;
         notification.organizationName = notification.organizationId?.name;
-        notification.from = notification.organizationCredentialId?.emailUserName;
-        notification.to = notification.receiverEmailId;
-        delete notification.receiverEmailId;
-        delete notification.organizationCredentialId;
         delete notification.organizationId;
     }
+
+    notification.to = notification.receiverEmailId;
+    delete notification.receiverEmailId;
 
     return res.status(200).json(responseUtil.success({
         message: "Notification histories details fetched successfully",
@@ -261,16 +265,21 @@ exports.queueDetailsById = async (req, res) => {
     }
 
     if (notification.organizationCredentialId) {
+        notification.from = notification.organizationCredentialId.emailUserName;
+        delete notification.organizationCredentialId;
+    }
+
+    if (notification.organizationId) {
         notification.organizationEmail = notification.organizationId?.emailId;
         notification.organizationName = notification.organizationId?.name;
-        notification.from = notification.organizationCredentialId?.emailUserName;
-        notification.to = notification.receiverEmailId;
-        notification.entryTime = notification.createdAt;
-        delete notification.receiverEmailId;
-        delete notification.createdAt;
-        delete notification.organizationCredentialId;
         delete notification.organizationId;
     }
+
+    notification.to = notification.receiverEmailId;
+    notification.entryTime = notification.createdAt;
+
+    delete notification.receiverEmailId;
+    delete notification.createdAt;
 
     return res.status(200).json(responseUtil.success({
         message: "Queue Notification details fetched successfully",
