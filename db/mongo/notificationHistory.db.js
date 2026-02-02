@@ -3,7 +3,7 @@ const conn = require("./conn.mongo");
 const dbConstants = require("./constant.mongo");
 
 const db = new mongoose.Schema({
-    organizationId: { type: mongoose.Types.ObjectId, ref: "Organizations", index: true, required: true },
+    organizationId: { type: mongoose.Types.ObjectId, ref: "organizations", index: true, required: true },
     organizationCredentialId: { type: mongoose.Types.ObjectId, ref: "organization-credentials", index: true, required: true },
     receiverEmailId: { type: String, required: true },
     subject: { type: String, required: true },
