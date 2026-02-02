@@ -6,6 +6,8 @@ const organizationValidation = require("../../validations/organization.validatio
 const uuidUtils = require("../../utils/uuid.util");
 const mailUtil = require("../../utils/mail.util");
 const bcryptUtil = require("../../utils/bcrypt.util");
+const serverEnvUtil = require("../../utils/env.util");
+const organizationCredentialsDb = require("../../db/mongo/organizationCredentials.mongo");
 
 exports.list = async (req, res) => {
 
@@ -20,7 +22,7 @@ exports.list = async (req, res) => {
     const { skipNumber, limitNumber } = utilsConstant.getPaginationValues(req.query.page, req.query.limit);
     const { status, sort, search } = req.query;
 
-    const allowedSortFields = ["_id", "lastLogin"];
+    const allowedSortFields = ["_id", "lastLoginTime", "createdAt"];
     const sortOption = {};
     utilsConstant.setSortOptions(sort, allowedSortFields, sortOption);
 
@@ -80,7 +82,7 @@ exports.create = async (req, res) => {
         })
     }
 
-    const { name, description, logoUrl, emailId, password } = req.body;
+    const { name, emailId, password } = req.body;
     const isNameAlreadyExist = await organizationDb.findOne({ emailId: emailId });
 
     if (isNameAlreadyExist) {
@@ -102,13 +104,12 @@ exports.create = async (req, res) => {
     await organizationDb.create({
         name: name,
         emailId: emailId,
-        description: description,
-        logoUrl: logoUrl,
         secretKey: uuidUtils.getRandomId(),
         password: hashedPassword
     })
 
-    mailUtil.sendOrganizationPassword(emailId, password);
+    if (serverEnvUtil.SERVER_ENVIRONMENT == "prod")
+        mailUtil.sendOrganizationPassword(emailId, password);
 
     return res.status(201).json(responseUtil.success({
         message: "organization crate successfully",
@@ -148,4 +149,5 @@ exports.statusUpdate = async (req, res) => {
     }))
 
 }
+
 

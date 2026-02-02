@@ -27,7 +27,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // main router initialize
 app.use("/api/v1", authenticationMiddleware.checkAppId, require("./routes/main.route"));
-app.use("/api/v1/admin", authenticationMiddleware.checkAppId, require("./routes/admin.routes"));
 
 app.use(globalErrorHandlerMiddleware);
 

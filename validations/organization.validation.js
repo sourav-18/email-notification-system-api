@@ -4,8 +4,6 @@ const mongDbConstant = require("../db/mongo/constant.mongo");
 
 exports.createBody = joi.object({
     name: constantValidation.longString().required(),
-    description: constantValidation.longString(1, 1000).required(),
-    logoUrl: constantValidation.uri.required(),
     emailId: constantValidation.emailId.required(),
     password: constantValidation.longString(4, 20).required()
 })

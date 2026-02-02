@@ -1,14 +1,20 @@
 const router=require('express').Router();
 const authenticationMiddleware=require("../middlewares/authentication.middleware");
 const organizationController=require('../controllers/admin/organization.controller');
+const credentialController=require('../controllers/admin/credential.controller');
 
 
 
 
 //organization 
-router.post("/organizations",authenticationMiddleware.checkTokenFoAdmin,organizationController.create);
-router.get("/organizations",authenticationMiddleware.checkTokenFoAdmin,organizationController.list);
-router.put("/organizations/:id/status/:status",authenticationMiddleware.checkTokenFoAdmin,organizationController.statusUpdate);
+router.post("/organizations",organizationController.create);
+router.get("/organizations",organizationController.list);
+router.patch("/organizations/:id/status/:status",organizationController.statusUpdate);
+
+//credentials
+
+router.get("/organizations/credentials",credentialController.list);
+router.patch("/organizations/credentials/:id/status/:status",credentialController.statusUpdate);
 
 
 module.exports = router;
