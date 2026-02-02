@@ -57,7 +57,7 @@ exports.historyList = async (req, res) => {
             attemptCount: 1,
             status: 1,
             queueEntryTime: 1,
-            successTime:1,
+            successTime: 1,
             createdAt: 1,
         }).lean();
 
@@ -172,4 +172,108 @@ exports.queueList = async (req, res) => {
         }
     }))
 
+}
+
+exports.historyDetailsById = async (req, res) => {
+    const validation = notificationValidation.detailsByIdParams.validate(req.params);
+    if (validation.error) {
+        throw new CustomError({
+            message: validation.error.message,
+            statusCode: 400
+        })
+    }
+
+    const notification = await notificationHistoryDb.findOne({ _id: req.params.id })
+        .populate({ path: "organizationId", select: { name: 1, emailId: 1 } })
+        .populate({ path: "organizationCredentialId", select: { emailUserName: 1 } })
+        .select({
+            _id: 1,
+            receiverEmailId: 1,
+            subject: 1,
+            text: 1,
+            attemptCount: 1,
+            status: 1,
+            organizationId: 1,
+            organizationCredentialId: 1,
+            emailErrorMessage: 1,
+            queueEntryTime: 1,
+            scheduleTime: 1,
+            successTime: 1,
+            entryTime: 1
+        }).lean()
+
+    if (notification == null) {
+        throw new CustomError({
+            message: "Notification histories not found",
+            statusCode: 404
+        })
+    }
+
+    if (notification.organizationCredentialId) {
+        notification.organizationEmail = notification.organizationId?.emailId;
+        notification.organizationName = notification.organizationId?.name;
+        notification.from = notification.organizationCredentialId?.emailUserName;
+        notification.to = notification.receiverEmailId;
+        delete notification.receiverEmailId;
+        delete notification.organizationCredentialId;
+        delete notification.organizationId;
+    }
+
+    return res.status(200).json(responseUtil.success({
+        message: "Notification histories details fetched successfully",
+        data: notification
+    }))
+}
+
+exports.queueDetailsById = async (req, res) => {
+    const validation = notificationValidation.detailsByIdParams.validate(req.params);
+    if (validation.error) {
+        throw new CustomError({
+            message: validation.error.message,
+            statusCode: 400
+        })
+    }
+
+    const notification = await notificationQueueDb.findOne({ _id: req.params.id })
+        .populate({ path: "organizationId", select: { name: 1, emailId: 1 } })
+        .populate({ path: "organizationCredentialId", select: { emailUserName: 1 } })
+        .select({
+            _id: 1,
+            receiverEmailId: 1,
+            subject: 1,
+            text: 1,
+            attemptCount: 1,
+            status: 1,
+            organizationId: 1,
+            organizationCredentialId: 1,
+            emailErrorMessage: 1,
+            queueEntryTime: 1,
+            scheduleTime: 1,
+            successTime: 1,
+            createdAt: 1
+        }).lean()
+
+    if (notification == null) {
+        throw new CustomError({
+            message: "Queue notification not found",
+            statusCode: 404
+        })
+    }
+
+    if (notification.organizationCredentialId) {
+        notification.organizationEmail = notification.organizationId?.emailId;
+        notification.organizationName = notification.organizationId?.name;
+        notification.from = notification.organizationCredentialId?.emailUserName;
+        notification.to = notification.receiverEmailId;
+        notification.entryTime = notification.createdAt;
+        delete notification.receiverEmailId;
+        delete notification.createdAt;
+        delete notification.organizationCredentialId;
+        delete notification.organizationId;
+    }
+
+    return res.status(200).json(responseUtil.success({
+        message: "Queue Notification details fetched successfully",
+        data: notification
+    }))
 }

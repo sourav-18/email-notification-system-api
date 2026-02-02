@@ -17,7 +17,7 @@ exports.list = async (req, res) => {
     }
     const organizationId = req.headers.id;
     const { skipNumber, limitNumber } = utilsConstant.getPaginationValues(req.query.page, req.query.limit);
-    const { sort, search, credentialId,status } = req.query;
+    const { sort, search, credentialId, status } = req.query;
     const sortOption = {};
     const allowedSortFields = ["_id", "attemptCount", "queueEntryTime", "successTime"];
     utilsConstant.setSortOptions(sort, allowedSortFields, sortOption);
@@ -133,6 +133,7 @@ exports.saveSuccessNotificationFromQueue = async () => {
         const notificationIds = histories.map(item => item._id);
 
         for (const history of histories) {
+            history.entryTime = history.createdAt;
             delete history.createdAt;
             delete history._id;
         }
@@ -159,7 +160,8 @@ exports.saveFailedNotificationFromQueue = async () => {
         const notificationIds = histories.map(item => item._id);
 
         for (const history of histories) {
-            history.status = mongoDbConstant.notificationQueue.status.failed
+            history.status = mongoDbConstant.notificationQueue.status.failed;
+            history.entryTime = history.createdAt;
             delete history.createdAt;
             delete history._id;
         }
@@ -191,6 +193,7 @@ function getSaveSelectFiled() {
         successTime: 1,
         createdAt: 1,
         scheduleTime: 1,
-        queueEntryTime: 1
+        queueEntryTime: 1,
+        createdAt: 1
     }
 }

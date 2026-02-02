@@ -19,7 +19,9 @@ router.patch("/organizations/credentials/:id/status/:status",credentialControlle
 
 //Notifications
 router.get("/notifications/histories",notificationController.historyList);
+router.get("/notifications/histories/:id",notificationController.historyDetailsById);
 router.get("/notifications/queues",notificationController.queueList);
+router.get("/notifications/queues/:id",notificationController.queueDetailsById);
 
 
 

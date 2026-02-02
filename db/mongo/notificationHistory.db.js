@@ -11,8 +11,9 @@ const db = new mongoose.Schema({
     attemptCount: { type: Number, required: true, default: 0 },
     queueEntryTime: { type: Date },
     successTime: { type: Date },
-    emailErrorMessage: {type: String},
-    scheduleTime:{type: Date},
+    emailErrorMessage: { type: String },
+    scheduleTime: { type: Date },
+    entryTime: { type: Date },
     priority: {
         type: Number,
         required: true,
