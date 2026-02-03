@@ -9,7 +9,7 @@ router.use("/auth",authRouter);
 router.use("/notifications",authenticationMiddleware.checkTokenForOrganization,notificationRouter);
 router.use("/organizations",authenticationMiddleware.checkTokenForOrganization,organizationRouter);
 
-router.use("/admin",authenticationMiddleware.checkTokenFoAdmin,adminRouter);
+router.use("/admins",authenticationMiddleware.checkTokenFoAdmin,adminRouter);
 
 
 module.exports = router;

@@ -74,6 +74,25 @@ exports.create = async (req, res) => {
 
 }
 
+exports.profileDetails = async (req, res) => {
+    const admin = await organizationDb.findById(req.headers.id).select({ _id: 1, name: 1, emailId: 1 }).lean();
+    if (admin === null) {
+        throw new CustomError({
+            message: "organization not found",
+            statusCode: 404
+        })
+    }
+
+    return res.status(200).json(responseUtil.success({
+        message: "Profile Details fetch successfully",
+        data: {
+            id: admin._id,
+            name: admin.name,
+            emailId: admin.emailId,
+        }
+    }))
+}
+
 exports.addCredentials = async (req, res) => {
     const validation = organizationValidation.addCredentialBody.validate(req.body);
     if (validation.error) {

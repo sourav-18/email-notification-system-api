@@ -5,7 +5,7 @@ const adminDb = require("../../db/mongo/admin.db");
 const jwt = require("jsonwebtoken");
 const envUtil = require("../../utils/env.util");
 const constantUtils = require("../../utils/constant.utils");
-const bcryptUtil=require("../../utils/bcrypt.util");
+const bcryptUtil = require("../../utils/bcrypt.util");
 
 exports.login = async (req, res) => {
 
@@ -21,7 +21,7 @@ exports.login = async (req, res) => {
 
     const adminDbRes = await adminDb.findOne({ emailId: emailId })
         .select({ _id: 1, name: 1, emailId: 1, password: 1, profilePic: 1 });
-        if (adminDbRes === null || await bcryptUtil.comparePassword(password,adminDbRes.password)===false) {
+    if (adminDbRes === null || await bcryptUtil.comparePassword(password, adminDbRes.password) === false) {
         throw new CustomError({
             message: "Invalid emailId or password",
             statusCode: 401
@@ -53,4 +53,23 @@ exports.login = async (req, res) => {
             token: token,
         }
     }))
-}  
+}
+
+exports.profileDetails = async (req, res) => {
+    const admin = await adminDb.findById(req.headers.id).select({ _id: 1, name: 1, emailId: 1 }).lean();
+    if (admin === null) {
+        throw new CustomError({
+            message: "admin not found",
+            statusCode: 404
+        })
+    }
+
+    return res.status(200).json(responseUtil.success({
+        message: "Profile Details fetch successfully",
+        data: {
+            id: admin._id,
+            name: admin.name,
+            emailId: admin.emailId,
+        }
+    }))
+}

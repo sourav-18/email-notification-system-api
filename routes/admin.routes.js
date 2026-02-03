@@ -3,9 +3,12 @@ const authenticationMiddleware=require("../middlewares/authentication.middleware
 const organizationController=require('../controllers/admin/organization.controller');
 const credentialController=require('../controllers/admin/credential.controller');
 const notificationController=require("../controllers/admin/notification.controller");
+const adminController=require("../controllers/admin/admin.controller");
 
 
 
+//admin
+router.get("/profile",adminController.profileDetails);
 
 //organization 
 router.post("/organizations",organizationController.create);
