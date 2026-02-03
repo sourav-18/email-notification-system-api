@@ -5,7 +5,7 @@ const utilsConstant = require("../utils/constant.utils");
 const CustomError = require("../errors/customError");
 const responseUtil = require("../utils/response.util");
 const notificationValidation = require("../validations/notification.validation");
-const constantValidation = require("../validations/constant.validation");
+
 
 exports.list = async (req, res) => {
     const validation = notificationValidation.listQuery.validate(req.query);
