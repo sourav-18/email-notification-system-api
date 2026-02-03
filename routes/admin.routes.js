@@ -1,5 +1,4 @@
 const router=require('express').Router();
-const authenticationMiddleware=require("../middlewares/authentication.middleware");
 const organizationController=require('../controllers/admin/organization.controller');
 const credentialController=require('../controllers/admin/credential.controller');
 const notificationController=require("../controllers/admin/notification.controller");
