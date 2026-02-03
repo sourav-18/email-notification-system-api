@@ -16,8 +16,7 @@ require("./cronJob/task.cronJob");
 app.use(cors(
     {
         origin: '*',
-        methods: ['GET', 'POST', 'PUT', 'PATCH'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'app-id','secret-key'],
+        methods: ['GET', 'POST', 'PUT', 'PATCH']
     }
 ));
 app.use(express.json());
