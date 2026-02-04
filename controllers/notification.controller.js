@@ -31,8 +31,6 @@ exports.send = async (req, res) => {
         })
     }
 
-    console.log(new Date(scheduleTime))
-
     await notificationQueueDb.create({
         organizationId: organizationCredentialDbRes.organizationId,
         organizationCredentialId: organizationCredentialId,
