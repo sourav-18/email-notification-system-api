@@ -30,6 +30,7 @@ exports.send = async (req, res) => {
             statusCode: 404
         })
     }
+    
     console.log(new Date(scheduleTime))
 
     await notificationQueueDb.create({
@@ -39,11 +40,11 @@ exports.send = async (req, res) => {
         subject: subject,
         text: text,
         priority: priority,
-        scheduleTime: new Date(scheduleTime).toISOString()
+        scheduleTime: new Date(scheduleTime)
     });
 
     return res.status(202).json(responseUtil.success({
-        message: "mail send initiated successfullyX",
+        message: "mail send initiated successfully",
         data: null
     }))
 
