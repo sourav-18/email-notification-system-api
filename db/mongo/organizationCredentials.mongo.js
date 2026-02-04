@@ -7,11 +7,11 @@ const db = new mongoose.Schema({
     emailUserName: { type: String, required: true },
     emailPassword: { type: String, required: true },
     emailRateLimit: { type: Number, required: true, default: 0 },
-    updatedBy: {type: mongoose.Types.ObjectId, ref: "admins"},
+    updatedBy: { type: mongoose.Types.ObjectId, ref: "admins" },
     status: {
         type: Number,
         enum: [...Object.values(dbConstants.organizationCredentials.status)],
-        default:dbConstants.organizationCredentials.status.active,
+        default: dbConstants.organizationCredentials.status.active,
         required: true
     },
     notificationSendPercent: {
@@ -24,10 +24,12 @@ const db = new mongoose.Schema({
             default: 0
         }
     }
-}, 
-{
-    timestamps:true
-}
+},
+    {
+        timestamps: {
+            currentTime: () => new Date().getTime() + 5.5 * 60 * 60 * 1000,
+        }
+    }
 );
 
 module.exports = mongoose.model("organization-credentials", db);

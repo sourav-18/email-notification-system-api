@@ -26,9 +26,11 @@ const db = new mongoose.Schema({
         enum: [...Object.values(dbConstants.notificationQueue.status)],
         default: dbConstants.notificationQueue.status.ideal
     },
-}, {
-    timestamps: true
-}
+},     {
+        timestamps: {
+            currentTime: () => new Date().getTime() + 5.5 * 60 * 60 * 1000,
+        }
+    }
 );
 
 module.exports = mongoose.model("notification-histories", db);

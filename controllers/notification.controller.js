@@ -30,7 +30,7 @@ exports.send = async (req, res) => {
             statusCode: 404
         })
     }
-    
+
     console.log(new Date(scheduleTime))
 
     await notificationQueueDb.create({
@@ -40,7 +40,7 @@ exports.send = async (req, res) => {
         subject: subject,
         text: text,
         priority: priority,
-        scheduleTime: new Date(scheduleTime)
+        scheduleTime: scheduleTime
     });
 
     return res.status(202).json(responseUtil.success({
