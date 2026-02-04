@@ -43,7 +43,7 @@ exports.send = async (req, res) => {
     });
 
     return res.status(202).json(responseUtil.success({
-        message: "mail send initiated successfully",
+        message: "mail send initiated successfullyX",
         data: null
     }))
 
