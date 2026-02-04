@@ -30,6 +30,7 @@ exports.send = async (req, res) => {
             statusCode: 404
         })
     }
+    console.log(new Date(scheduleTime))
 
     await notificationQueueDb.create({
         organizationId: organizationCredentialDbRes.organizationId,
@@ -38,7 +39,7 @@ exports.send = async (req, res) => {
         subject: subject,
         text: text,
         priority: priority,
-        scheduleTime: scheduleTime
+        scheduleTime: new Date(scheduleTime)
     });
 
     return res.status(202).json(responseUtil.success({
