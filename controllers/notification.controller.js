@@ -39,7 +39,7 @@ exports.send = async (req, res) => {
         subject: subject,
         text: text,
         priority: priority,
-        scheduleTime: new Date(scheduleTime)
+        scheduleTime: new Date(scheduleTime).toISOString()
     });
 
     return res.status(202).json(responseUtil.success({
