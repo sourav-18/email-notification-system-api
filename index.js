@@ -29,6 +29,10 @@ app.use("/api/v1", authenticationMiddleware.checkAppId, require("./routes/main.r
 
 app.use(globalErrorHandlerMiddleware);
 
+app.use((req,res)=>{
+    res.send("hello")
+})
+
 
 
 app.listen(envUtil.SERVER_PORT, (err) => {
