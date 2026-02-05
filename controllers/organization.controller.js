@@ -73,8 +73,8 @@ exports.create = async (req, res) => {
 }
 
 exports.profileDetails = async (req, res) => {
-    const admin = await organizationDb.findById(req.headers.id).select({ _id: 1, name: 1, emailId: 1,secretKey:1 }).lean();
-    if (admin === null) {
+    const organization = await organizationDb.findById(req.headers.id).select({ _id: 1, name: 1, emailId: 1,secretKey:1 }).lean();
+    if (organization === null) {
         throw new CustomError({
             message: "organization not found",
             statusCode: 404
@@ -84,9 +84,10 @@ exports.profileDetails = async (req, res) => {
     return res.status(200).json(responseUtil.success({
         message: "Profile Details fetch successfully",
         data: {
-            id: admin._id,
-            name: admin.name,
-            emailId: admin.emailId,
+            id: organization._id,
+            name: organization.name,
+            emailId: organization.emailId,
+            secretKey: organization.secretKey,
         }
     }))
 }
