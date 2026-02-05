@@ -56,7 +56,7 @@ async function getErrorOrgIds() {
 
     const matchPipeline = {
         $match: {
-            status:  mongoDbConstant.notificationQueue.status.error,
+            status: mongoDbConstant.notificationQueue.status.error,
         }
     };
     const groupPipeline = {
@@ -91,7 +91,7 @@ exports.sendIdealMail = async (priority) => {
             _id: orgCredId,
             status: mongoDbConstant.organizationCredentials.status.active
         }).select({ emailUserName: 1, emailPassword: 1, notificationSendPercent: 1, emailRateLimit: 1 });
-        
+
         if (organizationCredentialDbRes === null) return;
         let limit = (organizationCredentialDbRes.notificationSendPercent.immediate / 100) *
             organizationCredentialDbRes.emailRateLimit;
@@ -133,7 +133,9 @@ exports.sendIdealMail = async (priority) => {
 }
 
 exports.sendErrorMail = async () => {
-
+    let beforeTime = new Date();
+    beforeTime.setHours(beforeTime.getHours() - 1);
+    console.log(beforeTime);
     const status = mongoDbConstant.notificationQueue.status.error;
 
     const organizationCredentialIds = await getErrorOrgIds();
@@ -150,8 +152,7 @@ exports.sendErrorMail = async () => {
             organizationCredentialDbRes.emailRateLimit;
 
         limit = limit ? limit : 0; //for safe
-        let beforeTime = new Date();
-        beforeTime.setHours(beforeTime.getHours() - 1);
+
 
         const notificationQueueDbRes = await notificationQueueDb.find({
             organizationCredentialId: orgCredId,
