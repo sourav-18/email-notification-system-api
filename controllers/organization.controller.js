@@ -8,6 +8,7 @@ const envUtil = require("../utils/env.util");
 const bcryptUtil = require("../utils/bcrypt.util");
 const uuidUtils = require("../utils/uuid.util");
 const serverEnvUtil = require("../utils/env.util");
+const mailUtil=require("../utils/mail.util");
 
 exports.create = async (req, res) => {
     const validation = organizationValidation.createBody.validate(req.body);
@@ -55,9 +56,6 @@ exports.create = async (req, res) => {
             statusCode: 500
         })
     }
-
-    if (serverEnvUtil.SERVER_ENVIRONMENT == "prod")
-        mailUtil.sendOrganizationPassword(emailId, password);
 
     return res.status(201).json(responseUtil.success({
         message: "organization crate successfully",
