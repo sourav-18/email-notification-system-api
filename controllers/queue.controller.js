@@ -133,11 +133,8 @@ exports.sendIdealMail = async (priority) => {
 }
 
 exports.sendErrorMail = async () => {
-    console.log(new Date("2024-12-12 01:11"))
-    console.log(new Date("2024-12-12 01:11").toUTCString())
-    console.log(new Date())
-    console.log(new Date().toUTCString())
-    console.log("--")
+    console.log(new Date("2024-12-12T01:11:00Z"))
+    console.log(new Date("2024-12-12T01:11:00+05:30"))
 
 
     return;
