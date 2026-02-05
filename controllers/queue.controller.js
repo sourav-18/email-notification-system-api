@@ -49,6 +49,7 @@ async function getErrorOrgIds() {
 }
 
 exports.sendIdealMail = async (priority) => {
+    console.log("enter sendIdealMail")
     const status=mongoDbConstant.notificationQueue.status.ideal;
 
     let organizationCredentialIds = await getIdealOrgIds(priority);
