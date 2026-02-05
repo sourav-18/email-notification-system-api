@@ -133,10 +133,11 @@ exports.sendIdealMail = async (priority) => {
 }
 
 exports.sendErrorMail = async () => {
-    let beforeTime = new Date("2024-12-12 01:11");
-    console.log(beforeTime);
-    beforeTime.setHours(beforeTime.getHours() - 1);
-    console.log(beforeTime);
+    console.log(new Date("2024-12-12 01:11").toUTCString())
+    console.log(new Date().toUTCString())
+    console.log(new Date())
+
+
     return;
     const status = mongoDbConstant.notificationQueue.status.error;
 
