@@ -73,7 +73,7 @@ exports.create = async (req, res) => {
 }
 
 exports.profileDetails = async (req, res) => {
-    const admin = await organizationDb.findById(req.headers.id).select({ _id: 1, name: 1, emailId: 1 }).lean();
+    const admin = await organizationDb.findById(req.headers.id).select({ _id: 1, name: 1, emailId: 1,secretKey:1 }).lean();
     if (admin === null) {
         throw new CustomError({
             message: "organization not found",

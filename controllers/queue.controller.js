@@ -3,38 +3,13 @@ const mongoDbConstant = require("../db/mongo/constant.mongo");
 const mailUtil = require("../utils/mail.util");
 const notificationQueueDb = require("../db/mongo/notificationQueue.db");
 
-
-async function getImmediateOrgIds(status) {
+async function getIdealOrgIds(priority) {
     const aggregationArray = [];
 
     const matchPipeline = {
         $match: {
-            status: status,
-            priority: mongoDbConstant.notificationQueue.priority.immediate
-        }
-    };
-    const groupPipeline = {
-        $group: {
-            _id: "$organizationCredentialId"
-        }
-    };
-
-    aggregationArray.push(matchPipeline);
-    aggregationArray.push(groupPipeline);
-
-    const notificationQueueDbRes = await notificationQueueDb.aggregate(aggregationArray).exec();
-    if (notificationQueueDbRes.length === 0) return null;
-    return notificationQueueDbRes.map(item => item._id);
-}
-
-async function getScheduleOrgIds(status) {
-    const aggregationArray = [];
-
-    const matchPipeline = {
-        $match: {
-            status: status,
-            priority: mongoDbConstant.notificationQueue.priority.schedule,
-            scheduleTime: { $lte: new Date() }
+            status: mongoDbConstant.notificationQueue.status.ideal,
+            priority: priority
         }
     };
     const groupPipeline = {
@@ -56,7 +31,7 @@ async function getErrorOrgIds() {
 
     const matchPipeline = {
         $match: {
-            status:  mongoDbConstant.notificationQueue.status.error,
+            status: mongoDbConstant.notificationQueue.status.error,
         }
     };
     const groupPipeline = {
@@ -74,15 +49,9 @@ async function getErrorOrgIds() {
 }
 
 exports.sendIdealMail = async (priority) => {
-    const status = mongoDbConstant.notificationQueue.status.ideal;
+    const status=mongoDbConstant.notificationQueue.status.ideal;
 
-    let organizationCredentialIds = null;
-
-    if (priority === mongoDbConstant.notificationQueue.priority.immediate) {
-        organizationCredentialIds = await getImmediateOrgIds(status);
-    } else if (priority === mongoDbConstant.notificationQueue.priority.schedule) {
-        organizationCredentialIds = await getScheduleOrgIds(status);
-    }
+    let organizationCredentialIds = await getIdealOrgIds(priority);
 
     if (organizationCredentialIds === null) return;
 
@@ -91,18 +60,24 @@ exports.sendIdealMail = async (priority) => {
             _id: orgCredId,
             status: mongoDbConstant.organizationCredentials.status.active
         }).select({ emailUserName: 1, emailPassword: 1, notificationSendPercent: 1, emailRateLimit: 1 });
-        
+
         if (organizationCredentialDbRes === null) return;
         let limit = (organizationCredentialDbRes.notificationSendPercent.immediate / 100) *
             organizationCredentialDbRes.emailRateLimit;
 
         limit = limit ? limit : 0; //for safe
 
-        const notificationQueueDbRes = await notificationQueueDb.find({
+        const filterOptions = {
             organizationCredentialId: orgCredId,
             priority: priority,
             status: status
-        }).select({ receiverEmailId: 1, subject: 1, text: 1 })
+        }
+
+        if (priority === mongoDbConstant.notificationQueue.priority.schedule) {
+            filterOptions.scheduleTime = { $lte: new Date() }
+        }
+
+        const notificationQueueDbRes = await notificationQueueDb.find(filterOptions).select({ receiverEmailId: 1, subject: 1, text: 1 })
             .sort({ _id: 1 })
             .limit(limit);
 
@@ -117,6 +92,7 @@ exports.sendIdealMail = async (priority) => {
                 },
                 $inc: { attemptCount: 1 }
             }); // it insure that same notification not send twice
+
             if (isIdeal.matchedCount == 0) return;
             mailUtil.sendMail({
                 notificationId: notification.id,

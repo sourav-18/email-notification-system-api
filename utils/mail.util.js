@@ -22,6 +22,8 @@ exports.sendMail = async ({ notificationId, emailUserName, emailPassword, receiv
         subject: subject,
         text: text
     };
+    console.log("---------------start-------------")
+    console.log(mailOptions)
 
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
@@ -32,12 +34,13 @@ exports.sendMail = async ({ notificationId, emailUserName, emailPassword, receiv
             console.log('Email sent: ' + info.response);
         }
     });
+    console.log("---------------finish-------------")
 };
 
 const transporter = getTransporter(envUtil.SERVER_EMAIL_USERNAME, envUtil.SERVER_EMAIL_PASSWORD);
 
 exports.sendOrganizationPassword = (organizationEmailId, password) => {
-    
+
     const mailOptions = {
         from: envUtil.SERVER_EMAIL_USERNAME,
         to: organizationEmailId,
