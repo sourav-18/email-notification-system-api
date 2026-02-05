@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const conn = require("./conn.mongo");
 
 const db = new mongoose.Schema({
     name: { type: String, required: true},

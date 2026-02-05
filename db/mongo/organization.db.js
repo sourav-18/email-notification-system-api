@@ -9,7 +9,7 @@ const db = new mongoose.Schema({
     logoUrl: { type: String,default:"" },
     secretKey: { type: String, required: true },
     lastLoginTime: { type: Date },
-    status:{type:Number,default:dbConstants.organization.status.active},
+    status:{type:Number,default:dbConstants.organization.status.active,index:true},
     updatedBy: {type: mongoose.Types.ObjectId, ref: "admins"}
 
 },

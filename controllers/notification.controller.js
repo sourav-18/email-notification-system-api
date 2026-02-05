@@ -15,7 +15,8 @@ exports.send = async (req, res) => {
         })
     }
 
-    const { organizationCredentialId, to: receiverEmailId, subject, text, priority, scheduleTime } = req.body;
+    const { organizationCredentialId, to: receiverEmailId, subject, text, priority } = req.body;
+    let scheduleTime=req.body.scheduleTime;
 
     const organizationCredentialDbRes = await organizationCredentialDb
         .findOne({
@@ -30,8 +31,11 @@ exports.send = async (req, res) => {
             statusCode: 404
         })
     }
+
+    if(scheduleTime){
+        scheduleTime=scheduleTime+":00+05:30" //set is iso
+    }
     
-    console.log(new Date(scheduleTime))
 
     await notificationQueueDb.create({
         organizationId: organizationCredentialDbRes.organizationId,
@@ -40,7 +44,7 @@ exports.send = async (req, res) => {
         subject: subject,
         text: text,
         priority: priority,
-        scheduleTime: new Date(scheduleTime)
+        scheduleTime: scheduleTime
     });
 
     return res.status(202).json(responseUtil.success({
