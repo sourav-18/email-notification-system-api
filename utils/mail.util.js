@@ -22,8 +22,6 @@ exports.sendMail = async ({ notificationId, emailUserName, emailPassword, receiv
         subject: subject,
         text: text
     };
-    console.log("---------------start-------------")
-    console.log(mailOptions)
 
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
