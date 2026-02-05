@@ -27,14 +27,14 @@ exports.sendMail = async ({ notificationId, emailUserName, emailPassword, receiv
 
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-            console.log(error.message);
+            console.log(error);
             queueController.updateToError(notificationId, error.message);
         } else {
             queueController.updateToSuccess(notificationId);
             console.log('Email sent: ' + info.response);
         }
+        transporter.close()
     });
-    console.log("---------------finish-------------")
 };
 
 const transporter = getTransporter(envUtil.SERVER_EMAIL_USERNAME, envUtil.SERVER_EMAIL_PASSWORD);
