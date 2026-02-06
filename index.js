@@ -1,11 +1,10 @@
+require("fix-esm").register()
 require("dotenv").config();
 require("./db/mongo/conn.mongo");
 
 const express = require("express")
 const cors = require("cors");
 const app = express();
-
-console.log("-------------------------------------------enter-------------------------------")
 
 const envUtil = require("./utils/env.util");
 const dateUtil = require("./utils/date.util");
@@ -37,17 +36,17 @@ app.use((req,res)=>{
 
 
 
-// app.listen(envUtil.SERVER_PORT, (err) => {
-//     if (!err) {
-//         const serverStartInfo = {
-//             message: "Server started",
-//             port: envUtil.SERVER_PORT,
-//             host: envUtil.SERVER_ENVIRONMENT,
-//             time: dateUtil.getByFormat()
-//         }
-//         console.log(serverStartInfo);
-//     }
-// });
+app.listen(envUtil.SERVER_PORT, (err) => {
+    if (!err) {
+        const serverStartInfo = {
+            message: "Server started",
+            port: envUtil.SERVER_PORT,
+            host: envUtil.SERVER_ENVIRONMENT,
+            time: dateUtil.getByFormat()
+        }
+        console.log(serverStartInfo);
+    }
+});
 
 
 module.exports = app;
