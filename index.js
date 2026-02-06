@@ -23,7 +23,12 @@ app.use(cors(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
+app.use((req,res,next)=>{
+    if(!req.body){
+        req.body={}
+    }
+    next();
+})
 
 // main router initialize
 app.use("/api/v1", authenticationMiddleware.checkAppId, require("./routes/main.route"));
