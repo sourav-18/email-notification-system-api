@@ -5,6 +5,8 @@ const express = require("express")
 const cors = require("cors");
 const app = express();
 
+console.log("-------------------------------------------enter-------------------------------")
+
 const envUtil = require("./utils/env.util");
 const dateUtil = require("./utils/date.util");
 const globalErrorHandlerMiddleware = require("./middlewares/globalErrorHandler.middleware");
