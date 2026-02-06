@@ -1,6 +1,6 @@
 require("fix-esm").register()
 require("dotenv").config();
-require("./db/mongo/conn.mongo");
+require("./db/mongo/conn.mongo")()
 
 const express = require("express")
 const cors = require("cors");
