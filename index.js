@@ -35,14 +35,17 @@ app.use((req,res)=>{
 
 
 
-app.listen(envUtil.SERVER_PORT, (err) => {
-    if (!err) {
-        const serverStartInfo = {
-            message: "Server started",
-            port: envUtil.SERVER_PORT,
-            host: envUtil.SERVER_ENVIRONMENT,
-            time: dateUtil.getByFormat()
-        }
-        console.log(serverStartInfo);
-    }
-});
+// app.listen(envUtil.SERVER_PORT, (err) => {
+//     if (!err) {
+//         const serverStartInfo = {
+//             message: "Server started",
+//             port: envUtil.SERVER_PORT,
+//             host: envUtil.SERVER_ENVIRONMENT,
+//             time: dateUtil.getByFormat()
+//         }
+//         console.log(serverStartInfo);
+//     }
+// });
+
+
+module.exports = app;
