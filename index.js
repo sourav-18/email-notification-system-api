@@ -29,7 +29,6 @@ app.use((req, res, next) => {
     next();
 })
 
-// main router initialize
 
 async function startServer() {
 
@@ -37,6 +36,8 @@ async function startServer() {
     
     require("./cronJob/task.cronJob");
 
+    // main router initialize
+    
     app.use("/api/v1", authenticationMiddleware.checkAppId, require("./routes/main.route"));
 
     app.use(globalErrorHandlerMiddleware);

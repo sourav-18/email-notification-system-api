@@ -7,8 +7,7 @@ const constantUtils = require("../utils/constant.utils");
 const envUtil = require("../utils/env.util");
 const bcryptUtil = require("../utils/bcrypt.util");
 const uuidUtils = require("../utils/uuid.util");
-const serverEnvUtil = require("../utils/env.util");
-const mailUtil=require("../utils/mail.util");
+const mongoDbConstant = require("../db/mongo/constant.mongo");
 
 exports.create = async (req, res) => {
     const validation = organizationValidation.createBody.validate(req.body);
@@ -71,7 +70,7 @@ exports.create = async (req, res) => {
 }
 
 exports.profileDetails = async (req, res) => {
-    const organization = await organizationDb.findById(req.headers.id).select({ _id: 1, name: 1, emailId: 1,secretKey:1 }).lean();
+    const organization = await organizationDb.findById(req.headers.id).select({ _id: 1, name: 1, emailId: 1, secretKey: 1 }).lean();
     if (organization === null) {
         throw new CustomError({
             message: "organization not found",
@@ -103,11 +102,19 @@ exports.login = async (req, res) => {
     const { emailId, password } = req.body;
 
     const organizationDbRes = await organizationDb.findOne({ emailId: emailId })
-        .select({ _id: 1, name: 1, emailId: 1, password: 1, logoUrl: 1, secretKey: 1 });
+        .select({ _id: 1, name: 1, emailId: 1, password: 1, logoUrl: 1, secretKey: 1, status: 1 });
+
 
     if (organizationDbRes === null || await bcryptUtil.comparePassword(password, organizationDbRes.password) === false) {
         throw new CustomError({
             message: "Invalid emailId or password",
+            statusCode: 401
+        })
+    }
+
+    if(organizationDbRes.status===mongoDbConstant.organization.status.inactive){
+        throw new CustomError({
+            message: "Your account is inactive, please contact to admin",
             statusCode: 401
         })
     }
