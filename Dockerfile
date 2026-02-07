@@ -15,4 +15,4 @@ COPY . /server/
 
 EXPOSE 5000
 
-CMD ["pm2-runtime", "start", "pm2.config.js"]
+CMD ["npm", "run", "start"]
