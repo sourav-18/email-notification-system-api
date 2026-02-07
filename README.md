@@ -8,35 +8,23 @@ This repository contains the **backend API** for the Email Notification System. 
 
 ## 🚀 Overview
 
-The Email Notification System backend acts as a **scalable email API provider**.
+A **backend-focused, queue-based email notification API** supporting **immediate and scheduled email delivery**.
 
-Using this system:
-
-* Organizations can register and authenticate
-* Organizations can securely store email credentials (Gmail + App Password)
-* Emails can be sent **programmatically via APIs** or **manually from the UI**
-* Every email request is logged and stored as notification history
-* Admins can monitor and manage all organizations and email activity
-
-This backend powers the frontend dashboard and external API integrations.
+Email requests are pushed into a **queue** and processed asynchronously by **cron-based workers**, sending emails in a **controlled, rate-limited manner** to avoid SMTP (Gmail) limits. The system is **multi-tenant**, secure, and designed to work across **serverless and Docker-based deployments**.
 
 ---
 
 ## 🧩 Core Features
 
-### Organization Features
-
-* Organization signup & login
-* JWT-based authentication
-* Add & manage email credentials
-* Send email via REST APIs
-* View email notification history
-
-### Admin Features
-
-* View all organizations
-* Monitor email usage and activity
-* Manage system-level data
+* Queue-based email processing for reliable and scalable delivery
+* Support for **immediate and scheduled emails**
+* Cron-based workers to process email queues asynchronously
+* Rate-limited email sending to avoid SMTP (Gmail) provider limits
+* Secure REST APIs for email notifications
+* JWT-based authentication with role-based access (Admin & Organization)
+* Secure Gmail App Password credential management
+* Complete email notification history tracking
+* Admin-level monitoring and management
 
 ---
 
@@ -75,7 +63,6 @@ To successfully send emails:
 4. Save the email ID and app password using the API
 
 ⚠️ Normal Gmail passwords will **not work**.
-
 
 ## ▶️ Run Locally
 
